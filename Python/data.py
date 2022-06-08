@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 import os
 
 import csv
-import boto3
-import pandas as pd
+# import boto3
+# import pandas as pd
 import sys
 
 from datetime import datetime
@@ -13,14 +13,20 @@ from datetime import datetime
 def configure():
     load_dotenv()
 
-def setup_etl():
-    """call api key using os.get('api_key')"""
-    spotify_client_id = os.get('spotify_client_id')
-    spotify_client_secret = os.get('spotify_client_secret')
+def setup_etl(num_tracks=15):
+    """
+    Calls Spotify API using credentials to extract
+    most recently played tracks
+    INPUT: Takes in spotify API credentials that are defined
+    in global variables
+    RESULT: prints JSON response
+    """
+    spotify_client_id = os.getenv('spotify_client_id')
+    spotify_client_secret = os.getenv('spotify_client_secret')
     spotify_redirect_url = "http://localhost"
     scope = "user-read-recently-played"
 
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
-    results = sp.current_user_recently_played(int = 15)
+    results = sp.current_user_recently_played(int = num_tracks)
     print(results)
