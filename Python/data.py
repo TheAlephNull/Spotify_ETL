@@ -23,10 +23,14 @@ def setup_etl(num_tracks=15):
     """
     spotify_client_id = os.getenv('spotify_client_id')
     spotify_client_secret = os.getenv('spotify_client_secret')
-    spotify_redirect_url = "http://localhost"
+    spotify_redirect_url = "http://localhost:3000"
     scope = "user-read-recently-played"
 
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
+        client_id=spotify_client_id,
+        client_secret=spotify_client_secret,
+        redirect_uri=spotify_redirect_url,
+        scope=scope))
 
-    results = sp.current_user_recently_played(int = num_tracks)
+    results = sp.current_user_recently_played(limit = num_tracks)
     print(results)
