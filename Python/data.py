@@ -13,13 +13,13 @@ from datetime import datetime
 def configure():
     load_dotenv()
 
-def setup_etl(num_tracks=15):
+def extract_spotify(num_tracks=15):
     """
     Calls Spotify API using credentials to extract
     most recently played tracks
     INPUT: Takes in spotify API credentials that are defined
     in global variables
-    RESULT: prints JSON response
+    RESULT: returns JSON response
     """
     spotify_client_id = os.getenv('spotify_client_id')
     spotify_client_secret = os.getenv('spotify_client_secret')
@@ -33,4 +33,14 @@ def setup_etl(num_tracks=15):
         scope=scope))
 
     results = sp.current_user_recently_played(limit = num_tracks)
-    print(results)
+    return results
+
+def albums(results):
+    """
+    DOCSTRING: Creates the album datastructure. 
+    INPUT: Results - JSON of the responses from Spotify API call
+    RESULT: List - a list of strings of album names. 
+    """
+    albums = []
+    for items in results['items']:
+        print(items)

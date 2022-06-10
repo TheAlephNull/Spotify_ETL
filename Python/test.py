@@ -1,4 +1,5 @@
 import data
 
 data.configure()
-data.setup_etl()
+results = data.extract_spotify()
+data.albums(results)
