@@ -38,31 +38,38 @@ def extract_spotify(num_tracks=15):
 def albums(results):
     """
     DOCSTRING: Creates the album datastructure. 
-    INPUT: Results - JSON of the responses from Spotify API call
-    RESULT: List - a list of strings of album names. 
+    INPUT: Results (JSON) - the responses from Spotify API call
+    RETURNS: albums (a list of dictionaries) - containing album from track 
     """
     albums = []
     for items in results['items']:
-        # columns I want:
-        # 1. Album Name
-        # 2. Total Tracks
-        # 3. Album Release Date
-        # 4. Album URL
-        # 5. Album Type
-        album_name = 
-        total_tracks = 
-        album_release_date = 
-        album_URL = 
-        album_type = 
+        # columns of information I want:
+            # 0. Album ID
+            # 1. Album Name
+            # 2. Total Tracks
+            # 3. Album Release Date
+            # 4. Album URL
+            # 5. Album Type
+        album_ID = items['album']['id']
+        album_name = items['album']['name']
+        total_tracks = items['album']['total_tracks']
+        album_release_date = items['album']['release_date']
+        album_URL = items['album']['href']
+        album_type = items['album']['album_type']
 
+        # album dictionary containing necessary info (to append)
         album = {
-            'AlbumName':,
-            'NumTracks':,
-            'AlbumReleaseDate':,
-            'AlbumURL':,
-            'AlbumType':
+            'AlbumID': album_ID,
+            'AlbumName':album_name,
+            'NumTracks':total_tracks,
+            'AlbumReleaseDate':album_release_date,
+            'AlbumURL':album_URL,
+            'AlbumType':album_type
         }
-    
+
+        # add album to our list of albums
+        albums.append(album)
+
     return albums
 
 def tracks(results):
