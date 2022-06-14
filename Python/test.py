@@ -1,5 +1,7 @@
-import data
+import extract
 
-data.configure()
-results = data.extract_spotify()
-data.albums(results)
+extract.configure()
+results = extract.extract_spotify()
+# print(extract.albums(results))
+# print(extract.artists(results))
+# print(extract.tracks(results)) 

@@ -1,14 +1,7 @@
+import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
-import os
-
-import csv
-# import boto3
-# import pandas as pd
-import sys
-
-from datetime import datetime
 
 def configure():
     load_dotenv()
@@ -50,12 +43,12 @@ def albums(results):
             # 3. Album Release Date
             # 4. Album URL
             # 5. Album Type
-        album_ID = items['album']['id']
-        album_name = items['album']['name']
-        total_tracks = items['album']['total_tracks']
-        album_release_date = items['album']['release_date']
-        album_URL = items['album']['href']
-        album_type = items['album']['album_type']
+        album_ID = items['track']['album']['id']
+        album_name = items['track']['album']['name']
+        total_tracks = items['track']['album']['total_tracks']
+        album_release_date = items['track']['album']['release_date']
+        album_URL = items['track']['album']['external_urls']['spotify']
+        album_type = items['track']['album']['album_type']
 
         # album dictionary containing necessary info (to append)
         album = {
@@ -85,12 +78,12 @@ def tracks(results):
         # columns of information I want:
         Spotify_TrackID = items['track']['id'] # 1. Spotify Track ID
         Track_Name = items['track']['name'] # 2. Track Name
-        Track_URL = items['track']['href'] # 3. Track URL
+        Track_URL = items['track']['external_urls']['spotify'] # 3. Track URL
         Track_Popularity = items['track']['popularity'] # 4. Track Popularity (out of 100?)
         Track_TimePlayed = items['track']['duration_ms'] # 5. Track Duration (in ms)
         Track_Duration = items['played_at'] # 6. Track Time Played      
-        Artist_ID = items['artists'][0]['id'] # 7. Artist ID
-        Album_ID = items['album']['id'] # 8. Album ID
+        Artist_ID = items['track']['artists'][0]['id'] # 7. Artist ID
+        Album_ID = items['track']['album']['id'] # 8. Album ID
 
         # Create dictionary that contains track information
         track = {
@@ -112,13 +105,27 @@ def tracks(results):
 
 def artists(results):
     """
-    DOCSTRING:
-    INPUTS:
-    RESULT:
+    DOCSTRING: Creates the artist data structure
+    INPUTS: results (JSON) - response from API call
+    RESULT: artists (Dictionary of Lists)
     """
+    Artist_ID = []
+    Artist_Name = []
+    Artist_URL = []
     for items in results['items']:
-        # columns I want:
-        # 1. Spotify Artist ID
-        # 2. Artist ID?
-        # 3. Artist Name
-        pass
+        for name in items['track']['artists']:
+            # columns I want:
+            # 1. Spotify Artist ID
+            # 2. Artist Name
+            # 3. Artist URL
+            Artist_ID.append(name['id'])
+            Artist_Name.append(name['name'])
+            Artist_URL.append(name['external_urls']['spotify'])
+    
+    artists = {
+        'ArtistID':Artist_ID,
+        'ArtistName':Artist_Name,
+        'ArtistURL':Artist_URL
+    }
+
+    return artists
