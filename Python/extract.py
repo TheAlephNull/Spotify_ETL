@@ -80,8 +80,8 @@ def tracks(results):
         Track_Name = items['track']['name'] # 2. Track Name
         Track_URL = items['track']['external_urls']['spotify'] # 3. Track URL
         Track_Popularity = items['track']['popularity'] # 4. Track Popularity (out of 100?)
-        Track_TimePlayed = items['track']['duration_ms'] # 5. Track Duration (in ms)
-        Track_Duration = items['played_at'] # 6. Track Time Played      
+        Track_Duration = items['track']['duration_ms'] # 5. Track Duration (in ms)
+        Track_TimePlayed = items['played_at'] # 6. Track Time Played      
         Artist_ID = items['track']['artists'][0]['id'] # 7. Artist ID
         Album_ID = items['track']['album']['id'] # 8. Album ID
 
