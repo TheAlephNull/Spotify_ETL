@@ -20,7 +20,7 @@ def clean(df):
     # To-Do:
     # 1. Remove duplicates
     # 2. Remove nulls if any
-    df.drop_duplicates() # 1
+    df = df.drop_duplicates() # 1
 
     numNulls = pd.isnull(df).values.sum() 
     if numNulls == 0: # 2
@@ -41,7 +41,7 @@ def AlbumsDataFrame(albums):
     RETURNS: DataFrame
     """
     albums_df = pd.DataFrame.from_dict(albums) # make DataFrame
-    clean(albums_df) # clean data
+    albums_df = clean(albums_df) # clean data
     return albums_df
 
 def TracksDataFrame(tracks):
@@ -52,7 +52,7 @@ def TracksDataFrame(tracks):
     RETURNS: DataFrame
     """
     tracks_df = pd.DataFrame.from_dict(tracks)
-    clean(tracks_df)
+    tracks_df = clean(tracks_df)
     return tracks_df
     
 def ArtistsDataFrame(artists):
@@ -63,7 +63,7 @@ def ArtistsDataFrame(artists):
     RETURNS: artists_df (Pandas DataFrame)
     """
     artists_df = pd.DataFrame(artists)
-    clean(artists_df)
+    artists_df = clean(artists_df)
     return artists_df
 
 def transform_date(df, toDate, zone):
