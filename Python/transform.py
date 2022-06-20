@@ -1,8 +1,4 @@
-import csv
-import boto3
 import pandas as pd
-import sys
- 
 from datetime import datetime, timezone
 
 import extract
@@ -17,9 +13,10 @@ import extract
 
 def clean(df):
     """
-    DOCSTRING: Removes duplicates and checks for nulls
-    INPUTS: df (Pandas DataFrame) - the output of transforming
-    the reponse from 'extract.py'
+    DOCSTRING: (HELPER FUNCTION )Removes duplicates 
+    and checks for nulls
+    INPUTS: df (Pandas DataFrame) - the output of 
+    transforming the reponse from 'extract.py'
     RETURNS: cleaned (Pandas DataFrame)
     """
     # To-Do:
@@ -40,8 +37,8 @@ def clean(df):
 
 def AlbumsDataFrame(albums):
     """
-    DOCSTRING: Creates a Pandas DataFrame of the albums 
-    data structure & cleans
+    DOCSTRING: Creates a Pandas DataFrame of the 
+    albums data structure & cleans
     INPUTS: albums (List of Dictionaries)
     RETURNS: DataFrame
     """
@@ -71,14 +68,15 @@ def ArtistsDataFrame(artists):
     clean(artists_df)
     return artists_df
 
-def transform_date(df, toDate, zone='US/Pacific'):
+def transform_date(df, toDate, zone):
     """
-    DOCSTRING: (HELPER FUNCTION) Transforms tracks_df[toDate] to 
-    approrpiate DateTime object without the timezone stamp for 
-    SQL compatibility
+    DOCSTRING: (HELPER FUNCTION) Transforms tracks_df[toDate] 
+    to approrpiate DateTime object without the timezone stamp 
+    for SQL compatibility
     INPUT: df (Pandas DataFrame) - of data structure, 
     toDate (list) - list of columns that need to be fixed
-    timezone (string) - preferred time zone for conversion before UNIX
+    timezone (string) - preferred time zone for conversion 
+    before UNIX
     RETURNS: tracks_df[toDate]
     """
     df_copy = df.copy()
@@ -86,9 +84,12 @@ def transform_date(df, toDate, zone='US/Pacific'):
     df_copy[toDate] = df_copy[toDate].apply(pd.to_datetime)
     # change to local time zone by indexing first element of toDate 
     # (since only one element)
-    df_copy[toDate[0]] = df_copy[toDate[0]].dt.tz_convert(zone)
-    # remove time zone portion form DateTime object (not supported in SQL)
-    df_copy['TrackTimePlayed'] = df_copy['TrackTimePlayed'].dt.tz_convert(None)
+    try:
+        df_copy[toDate[0]] = df_copy[toDate[0]].dt.tz_convert(zone)
+        # remove time zone portion form DateTime object (not supported in SQL)
+        df_copy[toDate[0]] = df_copy[toDate[0]].dt.tz_convert(None)
+    except TypeError:
+        df_copy[toDate[0]] = pd.to_datetime(df_copy[toDate[0]])
 
     return df_copy[toDate]
 
@@ -164,13 +165,27 @@ def transform_artists(artists_df):
 
     return artists_df
 
-def transform(tracks_df, albums_df, artists_df):
+def transform(tracks, albums, artists):
     """
-    DOCSTRING:
-    INPUTS:
-    RETURNS:
+    DOCSTRING: Perform all necessary transformations on the
+    data frames (tracks, albums, and artists)
+    INPUTS: data (List or Dictionary) - of either 
+    tracks, albums, or artists
+    RETURNS: albumsdf, tracksdf, artistsdf (Pandas DataFrame)
     """
-    pass
+    tracksdf = TracksDataFrame(tracks)
+    tracksdf = transform_tracks(tracksdf)
+    print("Successfully transformed tracks")    
+    
+    albumsdf = AlbumsDataFrame(albums)
+    albumsdf = transform_albums(albumsdf)
+    print("Successfully transformed albums")
+
+    artistsdf = ArtistsDataFrame(artists)
+    artistsdf = transform_artists(artistsdf)
+    print("Successfully transformed artists")
+
+    return tracksdf, albumsdf, artistsdf
 
 # Notes:
 # error with numpy and mkl-service solved using https://github.com/ThilinaRajapakse/simpletransformers/issues/322
