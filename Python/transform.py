@@ -1,8 +1,6 @@
 import pandas as pd
 from datetime import datetime, timezone
 
-import extract
-
 # variables imported:
 # artists: List of Dictionaries
 # albums: List of Dictionaries
@@ -121,8 +119,8 @@ def create_uniqueID(tracks_df):
     """
     # convert column to unix 
     tracks_copy = tracks_df.copy()
-    tracks_copy['UNIXTimestamp'] = tracks_copy['TrackTimePlayed'].dt.timestamp()
-    tracks_copy['UNIXTimestamp'] = tracks_copy['UNIX Timestamp'].astype(str)
+    tracks_copy['UNIXTimestamp'] = (tracks_copy['TrackTimePlayed'] - pd.Timestamp('1970-01-01')) // pd.Timedelta('1s')
+    tracks_copy['UNIXTimestamp'] = tracks_copy['UNIXTimestamp'].astype(str)
 
     # create Unique ID
     tracks_copy['UniqueID'] = tracks_copy['SpotifyTrackID'] + "-" + tracks_copy['UNIXTimestamp']

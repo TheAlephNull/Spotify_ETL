@@ -1,5 +1,6 @@
 import extract
 import transform
+import load
 # import pandas as pd
 # from datetime import datetime, timezone
 
@@ -45,7 +46,11 @@ artists = extract.artists(results)
 
 tracksdf, albumsdf, artistsdf = transform.transform(tracks, albums, artists)
 print(albumsdf)
-
+# print(tracksdf)
+# print(artistsdf)
+# albumsdf.info()
+# artistsdf.info()
+# tracksdf.info()
 
 ## TEST: Debugging transform function by only looking at albums
 # extract.configure()
@@ -53,3 +58,12 @@ print(albumsdf)
 # albums = extract.albums(results)
 # albumsdf = transform.transform(albums, albums, albums)
 # print(albumsdf)
+
+## TEST: Excel file creation
+extract.configure()
+results = extract.extract_spotify()
+albums = extract.albums(results)
+tracks = extract.tracks(results)
+artists = extract.artists(results)
+tracksdf, albumsdf, artistsdf = transform.transform(tracks, albums, artists)
+load.create_xlsx(tracksdf, albumsdf, artistsdf)
