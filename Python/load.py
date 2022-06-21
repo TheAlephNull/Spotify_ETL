@@ -1,7 +1,9 @@
 import psycopg2
+from psycopg2 import OperationalError, errorcodes, errors
 from sqlalchemy import create_engine
 import sys
 import pandas as pd
+import os
 
 def create_xlsx(tracksdf, albumsdf, artistsdf):
     """
@@ -14,4 +16,59 @@ def create_xlsx(tracksdf, albumsdf, artistsdf):
         tracksdf.to_excel(writer, sheet_name = 'tracks', index = False)
         albumsdf.to_excel(writer, sheet_name = 'albums', index = False)
         artistsdf.to_excel(writer, sheet_name = 'artists', index = False)
+
+def show_psycopg2_exception(err):
+    """ (HELPER FUNCTION) OBTAINED FROM ARTICLE: """
+    # get details about the exception
+    err_type, err_obj, traceback = sys.exc_info()
+    # get the line number when exception occured
+    line_n = traceback.tb_lineno
+    # print the connect() error
+    print ("\npsycopg2 ERROR:", err, "on line number:", line_n)
+    print ("psycopg2 traceback:", traceback, "-- type:", err_type)
+    # psycopg2 extensions.Diagnostics object attribute
+    print ("\nextensions.Diagnostics:", err.diag)
+    # print the pgcode and pgerror exceptions
+    print ("pgerror:", err.pgerror)
+    print ("pgcode:", err.pgcode, "\n")
+    
+def setup_psql():
+    postgres_password = os.getenv('postgres_password')
+    
+    conn_params_dic = {
+        "host": "",
+        "user": "",
+        "password": postgres_password
+    }
+    return conn_params_dic # 1
+
+def connect(conn_params_dic):
+    conn = None
+    try:
+        print('Connecting to PostgreSQL')
+        conn = psycopg2.connect(**conn_params_dic) # 2
+        print('Connection successful..................')
+    
+    except OperationalError as err:
+        show_psycopg2_exception(err)
+        conn = None # set to none in case of error
+    return conn
+
+def create_db(conn_params_dic, dbname='table'):
+    conn = connect(conn_params_dic)
+    conn.autocommit = True
+
+    if conn != None:
+        try: 
+            cursor = conn.cursor() # 3
+            cursor.execute(f"DROP DATABASE IF EXISTS {dbname};") # drop table if exists
+            cursor.execute(f"CREATE DATABASE {dbname};")
+            print(f"{dbname} database created successfully..................")
+            # close cursor and connection
+            cursor.close()
+            conn.close()
+        except OperationalError as err:
+            show_psycopg2_exception(err)
+            conn = None
+
 
