@@ -33,6 +33,7 @@ def show_psycopg2_exception(err):
     print ("pgcode:", err.pgcode, "\n")
     
 def setup_psql():
+    """To create database"""
     postgres_password = os.getenv('postgres_password')
     
     conn_params_dic = {
@@ -41,6 +42,21 @@ def setup_psql():
         "password": postgres_password
     }
     return conn_params_dic # 1
+
+def setup_params(name):
+    """
+    DOCSTRING: After database has been created
+    """
+    postgres_password = os.getenv('postgres_password')
+
+    conn_params_dic = {
+        "host":"",
+        "database":name,
+        "user":"",
+        "password":os.getenv(postgres_password),
+    }
+
+    return conn_params_dic
 
 def connect(conn_params_dic):
     conn = None
@@ -71,4 +87,31 @@ def create_db(conn_params_dic, dbname='table'):
             show_psycopg2_exception(err)
             conn = None
 
+def create_tracks(dbname, conn):
+    """
+    """
+    if conn != None:
+        try:
+            cursor = conn.cursor()
+            # drop table if exists
+            sql = '''CREATE TABLE tracks(
+            SpotifyTrackID TEXT PRIMARY KEY NOT NULL,
+            TrackName TEXT NOT NULL,
+            TrackURL TEXT,
+            TrackPopularity SMALLINT,
+            TrackTimePlayed DATETIME2,
+            TrackDuration INTEGER,
+            ArtistID TEXT,
+            AlbumID TEXT,
+            )'''
+        except OperationalError as err:
+            show_psycopg2_exception(err)
+            conn = None
 
+def postgres_conn(conn_params_dic):
+    """
+    DOCSTRING: Initiates the connection to postgreSQL
+    using SQLAlchemy
+    """
+    connection = '-postgresql+psycopg2://user:password@host:port/dbname[?key=value&key=value...]'
+    
