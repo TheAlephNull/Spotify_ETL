@@ -37,23 +37,26 @@ def setup_psql():
     postgres_password = os.getenv('postgres_password')
     
     conn_params_dic = {
-        "host": "",
-        "user": "",
+        "host": "localhost",
+        "user": os.getenv('user'),
         "password": postgres_password
     }
+
     return conn_params_dic # 1
 
-def setup_params(name):
+def setup_params(dbname):
     """
     DOCSTRING: After database has been created
     """
     postgres_password = os.getenv('postgres_password')
+    user = os.getenv('user')
+    host='localhost'
 
     conn_params_dic = {
-        "host":"",
-        "database":name,
-        "user":"",
-        "password":os.getenv(postgres_password),
+        "host":host,
+        "database":dbname,
+        "user":user,
+        "password":postgres_password,
     }
 
     return conn_params_dic

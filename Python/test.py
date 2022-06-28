@@ -53,11 +53,11 @@ import load
 # tracksdf.info()
 
 ## TEST: Debugging transform function by only looking at albums
-extract.configure()
-results = extract.extract_spotify()
-albums = extract.albums(results)
-albumsdf, tracksdf, artistsdf = transform.transform(albums, albums, albums)
-print(albumsdf)
+# extract.configure()
+# results = extract.extract_spotify()
+# albums = extract.albums(results)
+# albumsdf, tracksdf, artistsdf = transform.transform(albums, albums, albums)
+# print(albumsdf)
 
 ## TEST: Excel file creation
 # extract.configure()
@@ -67,3 +67,9 @@ print(albumsdf)
 # artists = extract.artists(results)
 # tracksdf, albumsdf, artistsdf = transform.transform(tracks, albums, artists)
 # load.create_xlsx(tracksdf, albumsdf, artistsdf)
+
+## TEST PSQL CONNECTION
+# extract.configure()
+# conn_params_dic = load.setup_psql()
+# load.create_db(conn_params_dic,'test')
+
