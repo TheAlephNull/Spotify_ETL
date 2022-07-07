@@ -68,8 +68,12 @@ import load
 # tracksdf, albumsdf, artistsdf = transform.transform(tracks, albums, artists)
 # load.create_xlsx(tracksdf, albumsdf, artistsdf)
 
-## TEST PSQL CONNECTION
+# # TEST PSQL CONNECTION
 # extract.configure()
 # conn_params_dic = load.setup_psql()
 # load.create_db(conn_params_dic,'test')
 
+# # TEST: Creation of SQL TRACKS Table
+# extract.configure()
+# conn_params_dic = load.setup_params('test')
+# load.create_table('TRACKS', 'SQL/tracks.sql', conn_params_dic)

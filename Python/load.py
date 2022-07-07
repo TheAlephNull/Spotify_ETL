@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2 import OperationalError, errorcodes, errors
 from sqlalchemy import create_engine
+import sqlite3 
 import sys
 import pandas as pd
 import os
@@ -90,23 +91,31 @@ def create_db(conn_params_dic, dbname='table'):
             show_psycopg2_exception(err)
             conn = None
 
-def create_tracks(dbname, conn):
+def create_table(tablename, sql_file, conn_params_dic):
     """
+    DOCSTRING: creates a table in psql database based on 
+    connection provided using the SQL file to create the
+    schema.
+    INPUTS: tablename (STRING) - used to name the table,
+    sql_file (.sql) - sql code to create schema
+    conn (Database Connection) - connection to psql 
+    using parameters
     """
+    conn = connect(conn_params_dic)
+    conn.autocommit = True
+
+    fd = open(sql_file,'r')
+    sql = fd.read()
+
     if conn != None:
         try:
             cursor = conn.cursor()
             # drop table if exists
-            sql = '''CREATE TABLE tracks(
-            SpotifyTrackID TEXT PRIMARY KEY NOT NULL,
-            TrackName TEXT NOT NULL,
-            TrackURL TEXT,
-            TrackPopularity SMALLINT,
-            TrackTimePlayed DATETIME2,
-            TrackDuration INTEGER,
-            ArtistID TEXT,
-            AlbumID TEXT,
-            )'''
+            cursor.execute(sql)
+            print(f'{tablename} table created successfully.............')
+            cursor.close()
+            conn.close()
+
         except OperationalError as err:
             show_psycopg2_exception(err)
             conn = None
