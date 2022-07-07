@@ -15,13 +15,16 @@ def extract():
 def transform(tracks, albums, artists):
     return t.transform(tracks, albums, artists)
 
-def load():
-    # Convert to TEMP Excel
+def load(tracks, albums, artists):
+    # Convert to csv
+    l.create_csv(tracks, albums, artists)
     # IF DATABASE IS NEW:
+    try:
         # connect & create db
-    # ELSE:
+        l.setup_params('spotify_etl')
+    except:# ELSE:
         # connect
-    
+        pass
     # load data to databases
     pass
 

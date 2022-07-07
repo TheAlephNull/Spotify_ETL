@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 import sqlite3 
 import sys
 import pandas as pd
+from datetime import date
 import os
 
 def create_xlsx(tracksdf, albumsdf, artistsdf):
@@ -17,6 +18,18 @@ def create_xlsx(tracksdf, albumsdf, artistsdf):
         tracksdf.to_excel(writer, sheet_name = 'tracks', index = False)
         albumsdf.to_excel(writer, sheet_name = 'albums', index = False)
         artistsdf.to_excel(writer, sheet_name = 'artists', index = False)
+
+def create_csv(tracksdf, albumsdf, artistsdf):
+    """
+    DOCSTRING: Converts tracks, albums, and artists dataframes into 3 csv files
+    INPUTS: tracksdf (Pandas DataFrame), albumsdf( Pandas DataFrame), artistsdf 
+    (Pandas DataFrame) - after transformation done in `transform.py`
+    RETURNS: tracks, albums, artists.csv (CSV) - in downloads folder
+    """
+    today = date.today()
+    tracksdf.to_csv(f"C:/Users/henrya1/Downloads/tracks{today}.csv")
+    albumsdf.to_csv(f"C:/Users/henrya1/Downloads/albums{today}.csv")
+    artistsdf.to_csv(f"C:/Users/henrya1/Downloads/artists{today}.csv")
 
 def show_psycopg2_exception(err):
     """ (HELPER FUNCTION) OBTAINED FROM ARTICLE: """
