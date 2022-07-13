@@ -46,9 +46,11 @@ if __name__ == "__main__":
     tracks, albums, artists = transform(tracks, albums, artists)
     print("Successfully transformed data.................")
     try:
+        print('tried this')
         load(tracks, albums, artists, dbname)
     except:
+        print('then i tried this')
         firstload(dbname)
-        load(tracks, albums, artists)
+        load(tracks, albums, artists, dbname)
 
     print("Finished Extract, Load, Transform Spotify")

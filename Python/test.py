@@ -5,11 +5,11 @@ import load
 # from datetime import datetime, timezone
 
 # TEST: JSON Extraction & API Configuration
-extract.configure()
-results = extract.extract_spotify()
-print(extract.albums(results))
-print(extract.artists(results))
-print(extract.tracks(results)) 
+# extract.configure()
+# results = extract.extract_spotify()
+# print(extract.albums(results))
+# print(extract.artists(results))
+# print(extract.tracks(results)) 
 
 ## TEST: whether the dataframes were created successfully
 #albumsdf = transform.AlbumsDataFrame(extract.albums(results))
