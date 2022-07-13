@@ -133,10 +133,21 @@ def create_table(tablename, sql_file, conn_params_dic):
             show_psycopg2_exception(err)
             conn = None
 
-def postgres_conn(conn_params_dic):
-    """
-    DOCSTRING: Initiates the connection to postgreSQL
-    using SQLAlchemy
-    """
-    connection = '-postgresql+psycopg2://user:password@host:port/dbname[?key=value&key=value...]'
+# Define function using cursor.executemany() to insert the dataframe
+def execute_many(conn, datafrm, table):
+    # Creating a list of tupples from the dataframe values
+    tpls = [tuple(x) for x in datafrm.to_numpy()]
+    # dataframe columns with Comma-separated
+    cols = ','.join(list(datafrm.columns))
+    # SQL query to execute
+    sql = "INSERT INTO %s(%s) VALUES(%%s,%%s,%%s,%%s,%%s)" % (table, cols)
+    cursor = conn.cursor()
+    try:
+        cursor.executemany(sql, tpls)
+        conn.commit()
+        print("Data inserted using execute_many() successfully...")
+    except (Exception, psycopg2.DatabaseError) as err:
+        # pass exception to function
+        show_psycopg2_exception(err)
+        cursor.close()
     
