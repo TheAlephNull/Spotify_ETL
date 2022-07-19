@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS albums (
 );
 
 -- Artists
-CRETE TABLE IF NOT EXISTS artists (
+CREATE TABLE IF NOT EXISTS artists (
     ArtistID TEXT PRIMARY KEY NOT NULL,
     ArtistName TEXT NOT NULL,
     ArtistURL TEXT

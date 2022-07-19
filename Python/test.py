@@ -77,3 +77,8 @@ import load
 # extract.configure()
 # conn_params_dic = load.setup_params('test')
 # load.create_table('TRACKS', 'SQL/tracks.sql', conn_params_dic)
+
+# TEST: Creation of SQL TRACKS Table
+extract.configure()
+conn_params_dic = load.setup_params('spotifytmp')
+load.create_table('test', 'SQL/tracks.sql', conn_params_dic)

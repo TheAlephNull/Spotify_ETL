@@ -19,38 +19,49 @@ def firstload(dbname):
     """:/"""
     # Create TEMP database & table to house data
     conn_param_dic = l.setup_psql()
-    l.create_db(conn_param_dic, dbname)
-    conn_param_dic = l.setup_params(dbname)
-    l.create_table('Tracks', 'SQL/tracks.sql', conn_param_dic)
-    l.create_table('Albums', 'SQL/albums.sql', conn_param_dic)
-    l.create_table('Artists', 'SQL/artists.sql', conn_param_dic)
+    conn = l.connect(conn_param_dic)
+    l.create_db(conn, dbname)
+    conn.close()
+    # reestablish connection since parameters updated
+    conn_param_dic = l.setup_psql(dbname)
+    conn = l.connect(conn_param_dic)
+
+    l.create_table('tracks', 'SQL/tracks.sql', conn)
+    l.create_table('albums', 'SQL/albums.sql', conn)
+    l.create_table('artists', 'SQL/artists.sql', conn)
+    # conn.close()
+    print('`tracks`, `albums`, and `artists` tables created successfully...............')
 
 def load(tracks, albums, artists, dbname):
     """Assumes that database and table have been created"""
     conn_param_dic = l.setup_params(dbname)
     conn = l.connect(conn_param_dic)
-    conn.autocommit = True
 
-    l.execute_many(conn, dbname, 'Tracks')
-    l.execute_many(conn, dbname, 'Albums')
-    l.execute_many(conn, dbname, 'Artists')
+    l.execute_many(conn, tracks, 'tracks')
+    l.execute_many(conn, albums, 'albums')
+    l.execute_many(conn, artists, 'artists')
+    
+    conn.close()
 
 if __name__ == "__main__":
-    # INPUTS
+    # INPUTS ========================================
     numtracks = 15
-    dbname = 'SpotifyTMP'
-    # ETL'
+    dbname = 'spotifytmp'
+    # ETL ===========================================
+    # EXTRACT
     e.configure()
     tracks, albums, artists = extract(numtracks) # extract tracks
     print("Successfully extracted from Spotify..............")
+    # TRANFORM
     tracks, albums, artists = transform(tracks, albums, artists)
     print("Successfully transformed data.................")
+    # LOAD
     try:
-        print('tried this')
         load(tracks, albums, artists, dbname)
     except:
-        print('then i tried this')
+        print(f'{dbname} database does not exist. \nCreating Database....................')
         firstload(dbname)
         load(tracks, albums, artists, dbname)
-
+    print("=========================================")
     print("Finished Extract, Load, Transform Spotify")
+    print("=========================================")

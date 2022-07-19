@@ -1,6 +1,7 @@
 -- Tracks
 CREATE TABLE IF NOT EXISTS tracks (
-    SpotifyTrackID TEXT PRIMARY KEY NOT NULL,
+    UniqueID TEXT PRIMARY KEY NOT NULL,
+    SpotifyTrackID TEXT NOT NULL,
     TrackName TEXT NOT NULL,
     TrackURL TEXT,
     TrackPopularity SMALLINT,

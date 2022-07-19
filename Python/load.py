@@ -1,7 +1,7 @@
 import psycopg2
 from psycopg2 import OperationalError, errorcodes, errors
+import psycopg2.extras as extras
 from sqlalchemy import create_engine
-import sqlite3 
 import sys
 import pandas as pd
 from datetime import date
@@ -46,40 +46,36 @@ def show_psycopg2_exception(err):
     print ("pgerror:", err.pgerror)
     print ("pgcode:", err.pgcode, "\n")
     
-def setup_psql():
+def setup_psql(dbname = ""):
     """To create database"""
-    postgres_password = os.getenv('postgres_password')
-    
-    conn_params_dic = {
-        "host": "localhost",
-        "user": os.getenv('user'),
-        "password": postgres_password
-    }
-
-    return conn_params_dic # 1
-
-def setup_params(dbname):
-    """
-    DOCSTRING: After database has been created
-    """
     postgres_password = os.getenv('postgres_password')
     user = os.getenv('user')
     host='localhost'
 
-    conn_params_dic = {
-        "host":host,
-        "database":dbname,
-        "user":user,
-        "password":postgres_password,
-    }
+    if dbname == "":
+        postgres_password = os.getenv('postgres_password')
+        
+        conn_params_dic = {
+            "host": host,
+            "user": user,
+            "password": postgres_password
+        }
+    else:
+        conn_params_dic = {
+            "host": host,
+            "database": dbname,
+            "user": user,
+            "password": postgres_password,
+        }
 
-    return conn_params_dic
+    return conn_params_dic # 1
 
 def connect(conn_params_dic):
     conn = None
     try:
         print('Connecting to PostgreSQL')
         conn = psycopg2.connect(**conn_params_dic) # 2
+        conn.autocommit = True
         print('Connection successful..................')
     
     except OperationalError as err:
@@ -87,10 +83,7 @@ def connect(conn_params_dic):
         conn = None # set to none in case of error
     return conn
 
-def create_db(conn_params_dic, dbname='table'):
-    conn = connect(conn_params_dic)
-    conn.autocommit = True
-
+def create_db(conn, dbname='table'):
     if conn != None:
         try: 
             cursor = conn.cursor() # 3
@@ -99,12 +92,12 @@ def create_db(conn_params_dic, dbname='table'):
             print(f"{dbname} database created successfully..................")
             # close cursor and connection
             cursor.close()
-            conn.close()
+            #conn.close() # commented out since next function `create_table` also closes
         except OperationalError as err:
             show_psycopg2_exception(err)
             conn = None
 
-def create_table(tablename, sql_file, conn_params_dic):
+def create_table(tablename, sql_file, conn):
     """
     DOCSTRING: creates a table in psql database based on 
     connection provided using the SQL file to create the
@@ -114,9 +107,6 @@ def create_table(tablename, sql_file, conn_params_dic):
     conn (Database Connection) - connection to psql 
     using parameters
     """
-    conn = connect(conn_params_dic)
-    conn.autocommit = True
-
     fd = open(sql_file,'r')
     sql = fd.read()
 
@@ -127,27 +117,35 @@ def create_table(tablename, sql_file, conn_params_dic):
             cursor.execute(sql)
             print(f'{tablename} table created successfully.............')
             cursor.close()
-            conn.close()
-
+            # conn.close() # conn.close() will be called only once outside of function
         except OperationalError as err:
             show_psycopg2_exception(err)
             conn = None
 
+def joinsql(table, cols):
+    """HELPER FUNCTION: returns sql code thats needed"""
+    if table == 'tracks':
+        sql = "INSERT INTO %s (%s) VALUES (%%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s, %%s)" % (table, cols)
+    elif table == 'albums':
+        sql = "INSERT INTO %s (%s) VALUES (%%s, %%s, %%s, %%s, %%s, %%s)" % (table, cols)
+    elif table == 'artists':
+        sql = "INSERT INTO %s (%s) VALUES (%%s, %%s, %%s)" % (table, cols)
+    return sql
+        
 # Define function using cursor.executemany() to insert the dataframe
-def execute_many(conn, datafrm, table):
+def execute_many(conn, df, table):
     # Creating a list of tupples from the dataframe values
-    tpls = [tuple(x) for x in datafrm.to_numpy()]
+    tpls = [tuple(x) for x in df.to_numpy()]
     # dataframe columns with Comma-separated
-    cols = ','.join(list(datafrm.columns))
+    cols = ','.join(list(df.columns))
     # SQL query to execute
-    sql = "INSERT INTO %s(%s) VALUES(%%s,%%s,%%s,%%s,%%s)" % (table, cols)
+    sql = joinsql(table, cols)
     cursor = conn.cursor()
     try:
         cursor.executemany(sql, tpls)
         conn.commit()
-        print("Data inserted using execute_many() successfully...")
+        print(f"Data inserted in {table} using execute_many() successfully...")
     except (Exception, psycopg2.DatabaseError) as err:
         # pass exception to function
         show_psycopg2_exception(err)
         cursor.close()
-    

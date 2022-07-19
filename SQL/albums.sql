@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS albums (
     AlbumID TEXT PRIMARY KEY NOT NULL,
     AlbumName TEXT NOT NULL,
     NumTracks SMALLINT,
-    AlbumReleaseDate DATETIME2,
+    AlbumReleaseDate TIMESTAMP,
     AlbumURL TEXT,
     AlbumType TEXT
 );
